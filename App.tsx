@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, ChevronLeft, RefreshCw, Moon, BookOpen, Download } from 'lucide-react';
+import { ChevronRight, ChevronLeft, RefreshCw, Download } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { HijriDateDisplay } from './components/HijriDateDisplay';
 import { GregorianDateDisplay } from './components/GregorianDateDisplay';
@@ -14,65 +14,45 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<boolean>(false);
   
-  // History state to prevent repetition
-  const [seenReferences, setSeenReferences] = useState<string[]>(() => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const isMounted = useRef(false);
+
+  // History system to track seen hadiths
+  const getHistory = () => {
     try {
       const saved = localStorage.getItem('noor_hadith_history');
       return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+    } catch { return []; }
+  };
 
-  // Reference for the card to capture
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  // Initial fetch
-  useEffect(() => {
-    // Pass the initial state directly to avoid dependency issues on mount
-    const initialHistory = (() => {
-      try {
-        const saved = localStorage.getItem('noor_hadith_history');
-        return saved ? JSON.parse(saved) : [];
-      } catch {
-        return [];
-      }
-    })();
-    handleFetchHadith(initialHistory);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleFetchHadith = async (historyContext?: string[]) => {
-    if (loading) return; // Prevent double clicks
+  const handleFetchHadith = async (isInitial = false) => {
+    if (loading) return;
     
     setLoading(true);
     setError(null);
     try {
-      // Use provided context or current state
-      const exclusions = historyContext || seenReferences;
-      const data = await fetchDailyHadith(exclusions);
+      const history = getHistory();
+      const data = await fetchDailyHadith(history);
       setHadith(data);
       
-      // Update history if it's a new valid reference
       if (data.reference) {
-        setSeenReferences(prev => {
-           // Avoid duplicates in state
-           if (prev.includes(data.reference)) return prev;
-           
-           const newHistory = [...prev, data.reference];
-           // Keep history size manageable (last 50 items)
-           if (newHistory.length > 50) newHistory.shift();
-           
-           localStorage.setItem('noor_hadith_history', JSON.stringify(newHistory));
-           return newHistory;
-        });
+        const newHistory = Array.from(new Set([...history, data.reference])).slice(-50);
+        localStorage.setItem('noor_hadith_history', JSON.stringify(newHistory));
       }
     } catch (err: any) {
-      setError(err.message || "حدیث حاصل کرنے میں ناکامی");
+      setError(err.message || "ڈیٹا لوڈ کرنے میں مسئلہ پیش آیا");
     } finally {
       setLoading(false);
     }
   };
+
+  // Only trigger on mount
+  useEffect(() => {
+    if (!isMounted.current) {
+      handleFetchHadith(true);
+      isMounted.current = true;
+    }
+  }, []);
 
   const changeDate = (days: number) => {
     const newDate = new Date(currentDate);
@@ -81,124 +61,76 @@ export default function App() {
   };
 
   const handleDownload = async () => {
-    if (cardRef.current === null) {
-      return;
-    }
-    
+    if (!cardRef.current) return;
     setDownloading(true);
     try {
-      // Delay to ensure fonts and layout are stable before capture
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      const dataUrl = await toPng(cardRef.current, { 
-        cacheBust: true, 
-        pixelRatio: 3, // High resolution
-        backgroundColor: '#ffffff' // Ensure white background
-      });
-      
+      await new Promise(r => setTimeout(r, 1000));
+      const dataUrl = await toPng(cardRef.current, { cacheBust: true, pixelRatio: 2 });
       const link = document.createElement('a');
-      link.download = `Noor-e-Hidayat-${currentDate.toISOString().split('T')[0]}.png`;
+      link.download = `Hadith-${currentDate.toISOString().split('T')[0]}.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
-      console.error('Download failed', err);
-      alert('تصویر ڈاؤن لوڈ کرنے میں مسئلہ پیش آیا۔');
+      alert('تصویر محفوظ کرنے میں مسئلہ پیش آیا۔');
     } finally {
       setDownloading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center py-2 px-3 font-base text-islamic-dark overflow-x-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center py-4 px-4 font-base text-islamic-dark overflow-x-hidden">
       
       {/* External Controls */}
-      <div className="mb-4 flex flex-wrap justify-center items-center gap-3 bg-white/90 p-2 rounded-full backdrop-blur-sm border border-emerald-100 shadow-sm">
-         <button 
-            onClick={() => changeDate(-1)}
-            className="p-2 text-islamic-primary hover:bg-emerald-50 rounded-full transition-colors"
-            aria-label="Previous Day"
-          >
-            <ChevronRight className="w-5 h-5" />
+      <div className="mb-6 flex flex-wrap justify-center items-center gap-4 bg-white/95 p-3 rounded-full backdrop-blur-md border border-emerald-100 shadow-lg">
+         <button onClick={() => changeDate(-1)} className="p-2 text-islamic-primary hover:bg-emerald-50 rounded-full transition-all">
+            <ChevronRight className="w-6 h-6" />
          </button>
 
-         <button 
-            onClick={() => handleFetchHadith()}
-            disabled={loading}
-            className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600 text-white rounded-full font-bold hover:bg-emerald-700 transition-colors shadow-sm disabled:opacity-70 text-xs"
-         >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span>نئی حدیث</span>
+         <button onClick={() => handleFetchHadith()} disabled={loading} className="flex items-center gap-2 px-6 py-2 bg-emerald-600 text-white rounded-full font-bold hover:bg-emerald-700 transition-all shadow-md disabled:opacity-70">
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <span className="text-sm">نئی حدیث</span>
          </button>
 
-         <button 
-            onClick={handleDownload}
-            disabled={downloading}
-            className="flex items-center gap-1.5 px-4 py-1.5 bg-islamic-accent text-white rounded-full font-bold hover:bg-amber-700 transition-colors shadow-sm disabled:opacity-70 text-xs"
-         >
-            <Download className={`w-3.5 h-3.5 ${downloading ? 'animate-bounce' : ''}`} />
-            <span>ڈاؤن لوڈ</span>
+         <button onClick={handleDownload} disabled={downloading} className="flex items-center gap-2 px-6 py-2 bg-islamic-accent text-white rounded-full font-bold hover:bg-amber-700 transition-all shadow-md disabled:opacity-70">
+            <Download className={`w-4 h-4 ${downloading ? 'animate-bounce' : ''}`} />
+            <span className="text-sm">ڈاؤن لوڈ</span>
          </button>
 
-         <button 
-            onClick={() => changeDate(1)}
-            className="p-2 text-islamic-primary hover:bg-emerald-50 rounded-full transition-colors"
-            aria-label="Next Day"
-          >
-            <ChevronLeft className="w-5 h-5" />
+         <button onClick={() => changeDate(1)} className="p-2 text-islamic-primary hover:bg-emerald-50 rounded-full transition-all">
+            <ChevronLeft className="w-6 h-6" />
          </button>
       </div>
 
       {/* Main Card */}
-      <main 
-        ref={cardRef} 
-        className="w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden border-2 border-emerald-50 relative"
-      >
-        {/* Header Strip */}
-        <div className="bg-islamic-primary text-white py-4 px-4 text-center">
-            <h1 className="text-3xl font-urdu leading-relaxed pt-1">کیلنڈر و حدیثِ رسول ﷺ</h1>
+      <main ref={cardRef} className="w-full max-w-sm bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border-4 border-emerald-50 relative">
+        <div className="bg-islamic-primary text-white py-6 px-4 text-center">
+            <h1 className="text-4xl font-urdu leading-snug tracking-wide">کیلنڈر و حدیثِ رسول ﷺ</h1>
         </div>
 
-        <div className="p-4">
-          
-          {/* Vertical Dates Section (Lines) */}
-          <div className="flex flex-col items-center justify-center text-center space-y-1 mb-5 mt-2">
-             {/* Hijri Date Line */}
+        <div className="p-6">
+          <div className="flex flex-col items-center justify-center text-center space-y-2 mb-8">
              <HijriDateDisplay date={currentDate} />
-             
-             {/* Gregorian Date Line */}
              <GregorianDateDisplay date={currentDate} />
           </div>
 
-          {/* Hadith Section */}
-          <div className="mt-1">
+          <div className="min-h-[200px] flex flex-col justify-center">
              <HadithCard data={hadith} loading={loading} error={error} />
           </div>
 
-          {/* Footer Signature */}
-          <div className="pt-3 mt-4 border-t border-dashed border-emerald-100 text-center" dir="ltr">
-             <p className="font-base text-lg text-islamic-primary mb-1 leading-none">
-               Volumatic Engineering
-             </p>
-             
-             {/* Specializations */}
-             <div className="text-[10px] text-emerald-800 font-sans leading-tight mb-2 opacity-90 space-y-0.5">
-                <p className="font-bold text-islamic-accent">Specializing in:</p>
+          <footer className="pt-6 mt-8 border-t border-dashed border-emerald-100 text-center" dir="ltr">
+             <p className="font-base text-2xl text-islamic-primary mb-2">Volumatic Engineering</p>
+             <div className="text-[11px] text-emerald-800 font-sans leading-tight mb-4 opacity-90">
+                <p className="font-bold text-islamic-accent uppercase tracking-wider mb-1">Specializing in:</p>
                 <p>Water Treatment Chemicals & Services</p>
                 <p>RO Plant Chemicals & Manufacturing</p>
                 <p>Boiler & Chiller Parts, Service & Maintenance</p>
              </div>
-
-             <p className="font-sans text-xs font-bold text-islamic-accent tracking-[0.2em] mt-1">
-               03008865734
-             </p>
-          </div>
-
+             <p className="font-sans text-sm font-black text-islamic-accent tracking-[0.25em]">03008865734</p>
+          </footer>
         </div>
         
-        {/* Decorative Bottom Bar */}
-        <div className="h-2 bg-gradient-to-r from-islamic-primary via-islamic-gold to-islamic-primary" />
+        <div className="h-3 bg-gradient-to-r from-islamic-primary via-islamic-gold to-islamic-primary" />
       </main>
-
     </div>
   );
 }
