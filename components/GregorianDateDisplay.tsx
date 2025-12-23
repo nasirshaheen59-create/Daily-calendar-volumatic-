@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { getFormattedGregorianDate } from '../utils/dateUtils';
 
@@ -9,8 +10,8 @@ export const GregorianDateDisplay: React.FC<GregorianDateDisplayProps> = ({ date
   const { day, month, year } = getFormattedGregorianDate(date);
 
   return (
-    <div className="w-full text-center -mt-2">
-      <h3 className="text-xl font-urdu font-bold text-gray-500 leading-relaxed">
+    <div className="w-full text-center">
+      <h3 className="text-lg font-urdu font-semibold text-gray-400 leading-normal">
         {day} {month} {year} عیسوی
       </h3>
     </div>

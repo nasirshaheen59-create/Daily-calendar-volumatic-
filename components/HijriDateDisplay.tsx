@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { getFormattedHijriDate, getUrduDayName } from '../utils/dateUtils';
 
@@ -11,7 +12,7 @@ export const HijriDateDisplay: React.FC<HijriDateDisplayProps> = ({ date }) => {
 
   return (
     <div className="w-full text-center">
-      <h2 className="text-[28px] font-urdu font-bold text-islamic-dark leading-[2.5] drop-shadow-sm">
+      <h2 className="text-[26px] font-urdu font-bold text-islamic-dark leading-[1.4] drop-shadow-sm">
         {dayName}، {day} {month} {year}ھ
       </h2>
     </div>

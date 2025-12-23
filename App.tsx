@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, RefreshCw, Download } from 'lucide-react';
 import { toPng } from 'html-to-image';
@@ -17,7 +18,6 @@ export default function App() {
   const cardRef = useRef<HTMLDivElement>(null);
   const isMounted = useRef(false);
 
-  // History system to track seen hadiths
   const getHistory = () => {
     try {
       const saved = localStorage.getItem('noor_hadith_history');
@@ -46,7 +46,6 @@ export default function App() {
     }
   };
 
-  // Only trigger on mount
   useEffect(() => {
     if (!isMounted.current) {
       handleFetchHadith(true);
@@ -64,10 +63,17 @@ export default function App() {
     if (!cardRef.current) return;
     setDownloading(true);
     try {
-      await new Promise(r => setTimeout(r, 1000));
-      const dataUrl = await toPng(cardRef.current, { cacheBust: true, pixelRatio: 2 });
+      // Ensure fonts are loaded and layout is stable
+      await new Promise(r => setTimeout(r, 800));
+      const dataUrl = await toPng(cardRef.current, { 
+        cacheBust: true, 
+        pixelRatio: 3,
+        style: {
+          transform: 'scale(1)',
+        }
+      });
       const link = document.createElement('a');
-      link.download = `Hadith-${currentDate.toISOString().split('T')[0]}.png`;
+      link.download = `Islamic-Calendar-${currentDate.toISOString().split('T')[0]}.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
@@ -78,59 +84,69 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center py-4 px-4 font-base text-islamic-dark overflow-x-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-start sm:justify-center py-6 px-2 font-base text-islamic-dark overflow-x-hidden bg-[#f0fdf4]">
       
-      {/* External Controls */}
-      <div className="mb-6 flex flex-wrap justify-center items-center gap-4 bg-white/95 p-3 rounded-full backdrop-blur-md border border-emerald-100 shadow-lg">
-         <button onClick={() => changeDate(-1)} className="p-2 text-islamic-primary hover:bg-emerald-50 rounded-full transition-all">
-            <ChevronRight className="w-6 h-6" />
+      {/* External Controls - Floating Style */}
+      <div className="mb-6 flex flex-wrap justify-center items-center gap-3 bg-white/95 p-2 px-4 rounded-full backdrop-blur-md border border-emerald-100 shadow-xl z-20">
+         <button onClick={() => changeDate(-1)} className="p-2 text-islamic-primary hover:bg-emerald-50 rounded-full transition-all" title="پچھلا دن">
+            <ChevronRight className="w-5 h-5" />
          </button>
 
-         <button onClick={() => handleFetchHadith()} disabled={loading} className="flex items-center gap-2 px-6 py-2 bg-emerald-600 text-white rounded-full font-bold hover:bg-emerald-700 transition-all shadow-md disabled:opacity-70">
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            <span className="text-sm">نئی حدیث</span>
+         <button onClick={() => handleFetchHadith()} disabled={loading} className="flex items-center gap-2 px-4 py-1.5 bg-emerald-600 text-white rounded-full font-bold hover:bg-emerald-700 transition-all shadow-sm disabled:opacity-70">
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            <span className="text-xs">نئی حدیث</span>
          </button>
 
-         <button onClick={handleDownload} disabled={downloading} className="flex items-center gap-2 px-6 py-2 bg-islamic-accent text-white rounded-full font-bold hover:bg-amber-700 transition-all shadow-md disabled:opacity-70">
-            <Download className={`w-4 h-4 ${downloading ? 'animate-bounce' : ''}`} />
-            <span className="text-sm">ڈاؤن لوڈ</span>
+         <button onClick={handleDownload} disabled={downloading} className="flex items-center gap-2 px-4 py-1.5 bg-islamic-accent text-white rounded-full font-bold hover:bg-amber-700 transition-all shadow-sm disabled:opacity-70">
+            <Download className={`w-3.5 h-3.5 ${downloading ? 'animate-bounce' : ''}`} />
+            <span className="text-xs">محفوظ کریں</span>
          </button>
 
-         <button onClick={() => changeDate(1)} className="p-2 text-islamic-primary hover:bg-emerald-50 rounded-full transition-all">
-            <ChevronLeft className="w-6 h-6" />
+         <button onClick={() => changeDate(1)} className="p-2 text-islamic-primary hover:bg-emerald-50 rounded-full transition-all" title="اگلا دن">
+            <ChevronLeft className="w-5 h-5" />
          </button>
       </div>
 
-      {/* Main Card */}
-      <main ref={cardRef} className="w-full max-w-sm bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border-4 border-emerald-50 relative">
-        <div className="bg-islamic-primary text-white py-6 px-4 text-center">
-            <h1 className="text-4xl font-urdu leading-snug tracking-wide">کیلنڈر و حدیثِ رسول ﷺ</h1>
+      {/* Main Card - Optimized for Mobile Fit */}
+      <main 
+        ref={cardRef} 
+        className="w-full max-w-[380px] bg-white rounded-[2rem] shadow-2xl overflow-hidden border-[6px] border-emerald-50/50 relative flex flex-col"
+      >
+        {/* Header - More Compact */}
+        <div className="bg-islamic-primary text-white pt-5 pb-4 px-4 text-center">
+            <h1 className="text-3xl font-urdu leading-normal tracking-tight">کیلنڈر و حدیثِ رسول ﷺ</h1>
         </div>
 
-        <div className="p-6">
-          <div className="flex flex-col items-center justify-center text-center space-y-2 mb-8">
+        <div className="px-4 py-5 flex flex-col flex-grow">
+          {/* Date Section - Tighter spacing */}
+          <div className="flex flex-col items-center justify-center text-center space-y-0.5 mb-6">
              <HijriDateDisplay date={currentDate} />
              <GregorianDateDisplay date={currentDate} />
           </div>
 
-          <div className="min-h-[200px] flex flex-col justify-center">
+          {/* Hadith Section - Auto-growing content */}
+          <div className="flex-grow flex flex-col justify-center mb-6">
              <HadithCard data={hadith} loading={loading} error={error} />
           </div>
 
-          <footer className="pt-6 mt-8 border-t border-dashed border-emerald-100 text-center" dir="ltr">
-             <p className="font-base text-2xl text-islamic-primary mb-2">Volumatic Engineering</p>
-             <div className="text-[11px] text-emerald-800 font-sans leading-tight mb-4 opacity-90">
-                <p className="font-bold text-islamic-accent uppercase tracking-wider mb-1">Specializing in:</p>
+          {/* Footer - Optimized spacing */}
+          <footer className="pt-4 border-t border-dashed border-emerald-100 text-center" dir="ltr">
+             <p className="font-base text-xl text-islamic-primary mb-1">Volumatic Engineering</p>
+             <div className="text-[10px] text-emerald-800 font-sans leading-[1.3] mb-3 opacity-90">
+                <p className="font-bold text-islamic-accent uppercase tracking-wider mb-0.5">SPECIALIZING IN:</p>
                 <p>Water Treatment Chemicals & Services</p>
                 <p>RO Plant Chemicals & Manufacturing</p>
-                <p>Boiler & Chiller Parts, Service & Maintenance</p>
+                <p>Boiler & Chiller Maintenance</p>
              </div>
-             <p className="font-sans text-sm font-black text-islamic-accent tracking-[0.25em]">03008865734</p>
+             <p className="font-sans text-sm font-black text-islamic-accent tracking-[0.2em]">03008865734</p>
           </footer>
         </div>
         
-        <div className="h-3 bg-gradient-to-r from-islamic-primary via-islamic-gold to-islamic-primary" />
+        {/* Bottom Decorative Bar */}
+        <div className="h-2.5 bg-gradient-to-r from-islamic-primary via-islamic-gold to-islamic-primary" />
       </main>
+
+      <p className="mt-4 text-[10px] text-emerald-800/50 font-sans uppercase tracking-widest">Digital Daily Diary</p>
     </div>
   );
 }

@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { Quote, ExternalLink, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { HadithData } from '../types';
 
 interface HadithCardProps {
@@ -12,18 +13,18 @@ export const HadithCard: React.FC<HadithCardProps> = ({ data, loading, error }) 
   
   if (loading) {
     return (
-      <div className="w-full h-32 flex flex-col items-center justify-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
-        <div className="w-6 h-6 border-2 border-islamic-primary border-t-transparent rounded-full animate-spin mb-2"></div>
-        <p className="text-islamic-primary font-urdu text-lg animate-pulse">حدیث لوڈ ہو رہی ہے...</p>
+      <div className="w-full h-32 flex flex-col items-center justify-center bg-gray-50/50 rounded-2xl border border-dashed border-emerald-100">
+        <div className="w-5 h-5 border-2 border-islamic-primary border-t-transparent rounded-full animate-spin mb-2"></div>
+        <p className="text-islamic-primary font-urdu text-base animate-pulse">حدیث لوڈ ہو رہی ہے...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="w-full p-3 bg-red-50 rounded-xl border border-red-100 flex items-center gap-2 text-red-700">
-        <AlertCircle className="w-4 h-4 flex-shrink-0" />
-        <p className="font-urdu text-sm">{error}</p>
+      <div className="w-full p-4 bg-red-50 rounded-xl border border-red-100 flex items-center gap-3 text-red-700">
+        <AlertCircle className="w-5 h-5 flex-shrink-0" />
+        <p className="font-urdu text-sm leading-relaxed">{error}</p>
       </div>
     );
   }
@@ -31,24 +32,26 @@ export const HadithCard: React.FC<HadithCardProps> = ({ data, loading, error }) 
   if (!data) return null;
 
   return (
-    <div className="bg-white rounded-xl p-4 shadow-sm border border-emerald-100 relative group">
-      
-      <div className="mb-2 relative z-10 text-center">
-         {/* Header - Urdu Font */}
-         <h3 className="text-2xl font-bold text-islamic-dark font-urdu mb-2 drop-shadow-sm leading-relaxed">
+    <div className="bg-emerald-50/30 rounded-3xl p-4 md:p-5 border border-emerald-100/50 relative overflow-hidden">
+      {/* Decorative watermark/element */}
+      <div className="absolute -top-4 -right-4 text-emerald-100/20 pointer-events-none">
+        <svg width="100" height="100" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.1L22 9.3L15.9 13.8L18.1 21L12 16.6L5.9 21L8.1 13.8L2 9.3L9.6 9.1L12 2Z"/></svg>
+      </div>
+
+      <div className="relative z-10 text-center flex flex-col items-center">
+         <h3 className="text-xl font-bold text-islamic-primary font-urdu mb-3 drop-shadow-sm opacity-90 border-b border-emerald-200/50 pb-1 px-4">
            رسول اللہ ﷺ نے فرمایا
          </h3>
 
-        {/* Hadith Text - Urdu Font */}
-        <p className="text-xl md:text-2xl text-islamic-dark leading-[2.2] font-urdu text-center px-1">
+        <p className="text-[21px] md:text-[23px] text-islamic-dark leading-[1.8] font-urdu text-center px-1 mb-4">
           {data.text}
         </p>
-      </div>
 
-      <div className="flex items-center justify-center pt-3 border-t border-emerald-50 mt-2">
-        <span className="text-sm text-white bg-islamic-primary/90 px-3 py-0.5 rounded-full font-urdu shadow-sm leading-relaxed">
-          {data.reference}
-        </span>
+        <div className="inline-flex items-center justify-center">
+          <span className="text-[12px] text-white bg-islamic-primary px-4 py-1 rounded-full font-urdu shadow-sm leading-none">
+            {data.reference}
+          </span>
+        </div>
       </div>
     </div>
   );
