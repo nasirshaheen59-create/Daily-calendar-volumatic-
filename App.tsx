@@ -68,6 +68,7 @@ export default function App() {
       const dataUrl = await toPng(cardRef.current, { 
         cacheBust: true, 
         pixelRatio: 3,
+        backgroundColor: '#ffffff',
         style: {
           transform: 'scale(1)',
         }
@@ -110,40 +111,40 @@ export default function App() {
       {/* Main Card - Optimized for Mobile Fit */}
       <main 
         ref={cardRef} 
-        className="w-full max-w-[380px] bg-white rounded-[2rem] shadow-2xl overflow-hidden border-[6px] border-emerald-50/50 relative flex flex-col"
+        className="w-full max-w-[380px] bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border-[6px] border-emerald-50/50 relative flex flex-col"
       >
         {/* Header - More Compact */}
-        <div className="bg-islamic-primary text-white pt-5 pb-4 px-4 text-center">
-            <h1 className="text-3xl font-urdu leading-normal tracking-tight">کیلنڈر و حدیثِ رسول ﷺ</h1>
+        <div className="bg-islamic-primary text-white pt-6 pb-5 px-4 text-center">
+            <h1 className="text-[32px] font-urdu leading-normal tracking-tight">کیلنڈر و حدیثِ رسول ﷺ</h1>
         </div>
 
-        <div className="px-4 py-5 flex flex-col flex-grow">
+        <div className="px-5 py-6 flex flex-col flex-grow">
           {/* Date Section - Tighter spacing */}
-          <div className="flex flex-col items-center justify-center text-center space-y-0.5 mb-6">
+          <div className="flex flex-col items-center justify-center text-center space-y-0.5 mb-8">
              <HijriDateDisplay date={currentDate} />
              <GregorianDateDisplay date={currentDate} />
           </div>
 
-          {/* Hadith Section - Auto-growing content */}
-          <div className="flex-grow flex flex-col justify-center mb-6">
+          {/* Hadith Section - Auto-growing content with flex-grow to push footer down */}
+          <div className="flex-grow flex flex-col justify-center mb-8">
              <HadithCard data={hadith} loading={loading} error={error} />
           </div>
 
-          {/* Footer - Optimized spacing */}
-          <footer className="pt-4 border-t border-dashed border-emerald-100 text-center" dir="ltr">
-             <p className="font-base text-xl text-islamic-primary mb-1">Volumatic Engineering</p>
-             <div className="text-[10px] text-emerald-800 font-sans leading-[1.3] mb-3 opacity-90">
-                <p className="font-bold text-islamic-accent uppercase tracking-wider mb-0.5">SPECIALIZING IN:</p>
+          {/* Footer - Optimized spacing and bottom margin for download safety */}
+          <footer className="pt-5 border-t border-dashed border-emerald-100 text-center mb-2" dir="ltr">
+             <p className="font-base text-2xl text-islamic-primary mb-1">Volumatic Engineering</p>
+             <div className="text-[11px] text-emerald-800 font-sans leading-[1.4] mb-4 opacity-90">
+                <p className="font-bold text-islamic-accent uppercase tracking-wider mb-1">SPECIALIZING IN:</p>
                 <p>Water Treatment Chemicals & Services</p>
                 <p>RO Plant Chemicals & Manufacturing</p>
                 <p>Boiler & Chiller Maintenance</p>
              </div>
-             <p className="font-sans text-sm font-black text-islamic-accent tracking-[0.2em]">03008865734</p>
+             <p className="font-sans text-base font-black text-islamic-accent tracking-[0.2em]">03008865734</p>
           </footer>
         </div>
         
         {/* Bottom Decorative Bar */}
-        <div className="h-2.5 bg-gradient-to-r from-islamic-primary via-islamic-gold to-islamic-primary" />
+        <div className="h-3 bg-gradient-to-r from-islamic-primary via-islamic-gold to-islamic-primary" />
       </main>
 
       <p className="mt-4 text-[10px] text-emerald-800/50 font-sans uppercase tracking-widest">Digital Daily Diary</p>

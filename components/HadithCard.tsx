@@ -13,8 +13,8 @@ export const HadithCard: React.FC<HadithCardProps> = ({ data, loading, error }) 
   
   if (loading) {
     return (
-      <div className="w-full h-32 flex flex-col items-center justify-center bg-gray-50/50 rounded-2xl border border-dashed border-emerald-100">
-        <div className="w-5 h-5 border-2 border-islamic-primary border-t-transparent rounded-full animate-spin mb-2"></div>
+      <div className="w-full h-40 flex flex-col items-center justify-center bg-gray-50/50 rounded-2xl border border-dashed border-emerald-100">
+        <div className="w-6 h-6 border-2 border-islamic-primary border-t-transparent rounded-full animate-spin mb-3"></div>
         <p className="text-islamic-primary font-urdu text-base animate-pulse">حدیث لوڈ ہو رہی ہے...</p>
       </div>
     );
@@ -32,25 +32,33 @@ export const HadithCard: React.FC<HadithCardProps> = ({ data, loading, error }) 
   if (!data) return null;
 
   return (
-    <div className="bg-emerald-50/30 rounded-3xl p-4 md:p-5 border border-emerald-100/50 relative overflow-hidden">
-      {/* Decorative watermark/element */}
-      <div className="absolute -top-4 -right-4 text-emerald-100/20 pointer-events-none">
-        <svg width="100" height="100" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.1L22 9.3L15.9 13.8L18.1 21L12 16.6L5.9 21L8.1 13.8L2 9.3L9.6 9.1L12 2Z"/></svg>
+    <div className="bg-emerald-50/40 rounded-[2.5rem] p-5 md:p-6 border border-emerald-100/60 relative overflow-hidden flex flex-col min-h-[220px]">
+      {/* Decorative watermark */}
+      <div className="absolute -top-6 -right-6 text-emerald-100/20 pointer-events-none transform rotate-12">
+        <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L14.4 9.1L22 9.3L15.9 13.8L18.1 21L12 16.6L5.9 21L8.1 13.8L2 9.3L9.6 9.1L12 2Z"/>
+        </svg>
       </div>
 
-      <div className="relative z-10 text-center flex flex-col items-center">
-         <h3 className="text-xl font-bold text-islamic-primary font-urdu mb-3 drop-shadow-sm opacity-90 border-b border-emerald-200/50 pb-1 px-4">
-           رسول اللہ ﷺ نے فرمایا
+      <div className="relative z-10 text-center flex flex-col items-center h-full">
+         <h3 className="text-[22px] font-bold text-islamic-primary font-urdu mb-4 drop-shadow-sm opacity-95 border-b-2 border-emerald-200/40 pb-1 px-6">
+           حدیثِ رسول ﷺ
          </h3>
 
-        <p className="text-[21px] md:text-[23px] text-islamic-dark leading-[1.8] font-urdu text-center px-1 mb-4">
-          {data.text}
-        </p>
+        {/* Main Text Area - Improved spacing to prevent overlap */}
+        <div className="flex-grow flex items-center justify-center mb-6">
+          <p className="text-[20px] md:text-[22px] text-islamic-dark leading-[1.85] font-urdu text-center px-1">
+            {data.text}
+          </p>
+        </div>
 
-        <div className="inline-flex items-center justify-center">
-          <span className="text-[12px] text-white bg-islamic-primary px-4 py-1 rounded-full font-urdu shadow-sm leading-none">
-            {data.reference}
-          </span>
+        {/* Reference Area - Ensured visibility and padding to prevent cutoff */}
+        <div className="w-full mt-auto pt-2 pb-1">
+          <div className="inline-flex items-center justify-center max-w-full">
+            <span className="text-[13px] text-white bg-islamic-primary/90 px-5 py-1.5 rounded-full font-urdu shadow-sm leading-tight text-center break-words">
+              {data.reference}
+            </span>
+          </div>
         </div>
       </div>
     </div>
