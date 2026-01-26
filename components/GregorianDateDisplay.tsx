@@ -11,7 +11,7 @@ export const GregorianDateDisplay: React.FC<GregorianDateDisplayProps> = ({ date
 
   return (
     <div className="w-full text-center">
-      <h3 className="text-lg font-urdu font-semibold text-gray-400 leading-normal">
+      <h3 className="text-base font-urdu font-semibold text-gray-400 leading-none">
         {day} {month} {year} عیسوی
       </h3>
     </div>
