@@ -4,6 +4,13 @@ export interface HadithData {
   sourceUrl?: string; // For grounding link
 }
 
+export interface IslamicEvent {
+  month: number; // 1-12
+  day: number;
+  name: string;
+  description: string;
+}
+
 export enum UrduMonths {
   Muharram = 'محرم',
   Safar = 'صفر',

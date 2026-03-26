@@ -15,7 +15,7 @@ export const getUrduDayName = (date: Date): string => {
 };
 
 // Custom function to get formatted Hijri date
-export const getFormattedHijriDate = (date: Date): { day: string, month: string, year: string } => {
+export const getFormattedHijriDate = (date: Date): { day: string, month: string, year: string, dayNum: number, monthNum: number } => {
   // PAKISTAN DATE ADJUSTMENT:
   // Pakistan is typically 1 day behind Saudi Arabia (Um Al Qura).
   // We subtract 1 day from the current Gregorian date before calculating the Hijri date
@@ -59,23 +59,27 @@ export const getFormattedHijriDate = (date: Date): { day: string, month: string,
   // However, modern browsers return standard strings for islamic-umalqura. 
   // Let's implement a fallback using part values if available, otherwise default logic.
   let urduMonth = HIJRI_MONTHS_MAP[month] || HIJRI_MONTHS_MAP[cleanMonthKey] || month;
+  let monthNum = 0;
 
   // Fallback: If map failed (browser differences), use a simpler numeric formatter to get month index
-  if (!HIJRI_MONTHS_MAP[month] && !HIJRI_MONTHS_MAP[cleanMonthKey]) {
-     const monthIndexFormatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { month: 'numeric' });
-     const mPart = monthIndexFormatter.formatToParts(adjustedDate).find(p => p.type === 'month');
-     if (mPart) {
-         const mIndex = parseInt(mPart.value) - 1;
-         if (mIndex >= 0 && mIndex < HIJRI_MONTHS_ARRAY.length) {
-             urduMonth = HIJRI_MONTHS_ARRAY[mIndex];
-         }
-     }
+  const monthIndexFormatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { month: 'numeric' });
+  const mPart = monthIndexFormatter.formatToParts(adjustedDate).find(p => p.type === 'month');
+  if (mPart) {
+      monthNum = parseInt(mPart.value);
+      const mIndex = monthNum - 1;
+      if (!HIJRI_MONTHS_MAP[month] && !HIJRI_MONTHS_MAP[cleanMonthKey]) {
+          if (mIndex >= 0 && mIndex < HIJRI_MONTHS_ARRAY.length) {
+              urduMonth = HIJRI_MONTHS_ARRAY[mIndex];
+          }
+      }
   }
 
   return {
     day: formattedDay,
     month: urduMonth,
-    year: urduYear
+    year: urduYear,
+    dayNum: parseInt(day),
+    monthNum: monthNum
   };
 };
 

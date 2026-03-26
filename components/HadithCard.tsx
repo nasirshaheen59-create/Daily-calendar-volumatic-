@@ -53,9 +53,9 @@ export const HadithCard: React.FC<HadithCardProps> = ({ data, loading, error }) 
         </div>
 
         {/* Reference Area - Guaranteed safety at bottom */}
-        <div className="w-full mt-3 pb-1">
-          <div className="inline-flex items-center justify-center max-w-full">
-            <span className="text-[11px] text-white bg-islamic-primary/90 px-4 py-1.5 rounded-full font-urdu shadow-sm leading-none text-center">
+        <div className="w-full mt-4 pb-1">
+          <div className="inline-flex items-center justify-center max-w-full px-2">
+            <span className="text-[13px] text-white bg-islamic-primary px-5 py-2 rounded-full font-urdu shadow-sm leading-relaxed text-center min-w-[140px] block">
               {data.reference}
             </span>
           </div>

@@ -5,7 +5,9 @@ import { toPng } from 'html-to-image';
 import { HijriDateDisplay } from './components/HijriDateDisplay';
 import { GregorianDateDisplay } from './components/GregorianDateDisplay';
 import { HadithCard } from './components/HadithCard';
+import { IslamicEventsDisplay } from './components/IslamicEventsDisplay';
 import { fetchDailyHadith } from './services/geminiService';
+import { getFormattedHijriDate } from './utils/dateUtils';
 import { HadithData } from './types';
 
 export default function App() {
@@ -17,6 +19,8 @@ export default function App() {
   
   const cardRef = useRef<HTMLDivElement>(null);
   const isMounted = useRef(false);
+
+  const { dayNum, monthNum } = getFormattedHijriDate(currentDate);
 
   const getHistory = () => {
     try {
@@ -129,6 +133,7 @@ export default function App() {
           <div className="flex flex-col items-center justify-center text-center space-y-0 mb-4">
              <HijriDateDisplay date={currentDate} />
              <GregorianDateDisplay date={currentDate} />
+             <IslamicEventsDisplay day={dayNum} month={monthNum} />
           </div>
 
           {/* Hadith Section - Dynamic Height but compact */}

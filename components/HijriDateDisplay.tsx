@@ -12,7 +12,7 @@ export const HijriDateDisplay: React.FC<HijriDateDisplayProps> = ({ date }) => {
 
   return (
     <div className="w-full text-center">
-      <h2 className="text-[24px] font-urdu font-bold text-islamic-dark leading-[1.2] drop-shadow-sm mb-1">
+      <h2 className="text-[24px] font-urdu font-bold text-islamic-dark leading-relaxed drop-shadow-sm mb-1">
         {dayName}، {day} {month} {year}ھ
       </h2>
     </div>

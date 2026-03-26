@@ -1,14 +1,14 @@
 import { HadithData } from '../types';
-import { ramadanHadiths } from '../data/ramadanHadiths';
+import { hadithData } from '../data/hadithData';
 
 export const fetchDailyHadith = async (excludeReferences: string[] = []): Promise<HadithData> => {
   // Simulate network delay for UI consistency
   await new Promise(resolve => setTimeout(resolve, 500));
 
   // Filter out recently shown hadiths if possible
-  let availableHadiths = ramadanHadiths;
+  let availableHadiths = hadithData;
   if (excludeReferences.length > 0) {
-    const filtered = ramadanHadiths.filter(h => !excludeReferences.includes(h.reference));
+    const filtered = hadithData.filter(h => !excludeReferences.includes(h.reference));
     if (filtered.length > 0) {
       availableHadiths = filtered;
     }
